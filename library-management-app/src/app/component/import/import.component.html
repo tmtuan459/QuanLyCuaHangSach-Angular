@@ -1,0 +1,426 @@
+<!-- data-bs-toggle: call show popup -->
+<!-- data-bs-target: call tới form chứa id, cần 2 cái để show modal -->
+<div class="navbar navbar-light overflow-group-a">
+  <h1 class="" style="margin-top:40xp;width:100%;text-align:center">Quản Lý Kho Hàng</h1>
+  <div style=" display: flex; justify-content: space-between; width: 100%;">
+
+    <!-- search -->
+    <div class="form-search-a">
+
+      <input id="input-form" type="text" class="form-control form-control-underlined" placeholder="Hãy nhập vào giá trị cần tìm kiếm" name="bookFilter"
+      (input)="searchImports(key.value)" #key="ngModel"  ngModel name="key" #input>
+      <i class="fa fa-times icon-search" type="button" onclick="document.getElementById('input-form').value = ''"
+        (click)="ngOnInit()">
+      </i>
+      <!-- <i class="fa fa-search icon-search"></i> -->
+
+    </div>
+    <!-- buntton add -->
+  </div>
+</div>
+
+<div style="display: flex; justify-content: space-between; width: 100%;" class="container-fluid">
+  <div>
+    <button (click)="getAllBook()" type="button" class="button-list  mg-right10" id="btnList"><span>Danh sách</span></button>
+    <button (click)="ClickInsufficient()" type="button" class="button-list  mg-right10" id="btnListI" data-bs-target="#staticBackdrop"
+    ><span>Sắp hết hàng</span> </button>
+    <button (click)="ClickRedundant()" type="button" class="button-list  mg-right10"id="btnListR" data-bs-target="#staticBackdrop"
+      ><span>Tồn hàng</span></button>
+  </div>
+
+  <div>
+    <button (click)="ClickImport()" type="button" class="btn2 mg-right10" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+     >Nhập hàng</button>
+
+    <button (click)="ClickExport()" type="button" class="btn2 mg-right10" data-bs-toggle="modal"
+      data-bs-target="#staticBackdrop2">Xuất hàng</button>
+
+  </div>
+
+
+
+</div>
+
+<div class=" form-group overflow-group-a container-fluid">
+  <label for="">{{noteTable}}</label>
+  <table class="table table-striped ">
+
+    <thead style="background-color: rgb(235,205,171);">
+      <tr>
+        <th scope="col" for="">Tên sách&nbsp;</th>
+        <th scope="col" class="number-format">Số lượng&nbsp;</th>
+        <th scope="col" class="number-format">Đơn giá&nbsp;</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor=" let row of bookData| slice: (page-1) * pageSize : page * pageSize">
+        <td class="text-format">
+          <div class="namebook-hover tensach-overflow"
+          tooltipClass="my-custom-class" ngbTooltip={{row.tensach}}>{{row.tensach}}</div>
+        </td>
+        <td class="number-format">{{row.soLuong}}</td>
+        <td class="number-format">{{row.donGia|number:'1.0-0'}}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+
+  <!-- Star footer -->
+  <div class="form-footer-a">
+    <!--START Show Item -->
+    <div class="row no-container">
+      <div class="col">
+
+        <div *ngIf="bookData && bookData.length != 0" class="show-item-padding">
+          <label class="form-check-label">Hiển thị
+            <select [(ngModel)]="pageSize">
+              <option [value]="5">5</option>
+              <option [value]="10">10</option>
+              <option [value]="15">15</option>
+              <option [value]="bookData.length">tất cả</option>
+
+            </select>
+          </label>
+        </div>
+
+      </div>
+      <!-- <div >Trang hiện tại: {{page}}</div> -->
+    </div>
+    <!--END Show Item -->
+
+    <div class="group-show-pagination-format">
+      <!--Start Showing -->
+      <div class="form-showing-a">
+        <div *ngIf="totalLength - (page * pageSize - pageSize +1) >= pageSize then content1 else content2">
+        </div>
+        <div>
+          <div>
+            <ng-template #content1 style="font-weight:bold; ">Đang hiện {{page*pageSize - pageSize+1}}
+              đến
+              {{page*pageSize}} của {{bookData.length}} đơn vị
+            </ng-template>
+          </div>
+        </div>
+
+        <ng-template #content2>Đang hiện {{page*pageSize-pageSize+1}} đến {{totalLength}} của {{totalLength}}
+          đơn vị
+        </ng-template>
+        <div *ngIf="bookData && bookData.length == 0">
+          <p>Không có mục hiển thị nào!</p>
+        </div>
+      </div>
+      <!--End Showing -->
+
+      <!--Start Pagination  -->
+      <div>
+        <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="totalLength"
+        [boundaryLinks]="true">
+        <ng-template ngbPaginationPages let-page let-pages="pages">
+            <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+                <div class="form-group d-flex flex-nowrap px-2">
+                    <label id="paginationInputLabel" for="paginationInput"
+                        class="col-form-label mr-2 ml-1">Trang</label>
+                    <input #i type="text" inputmode="numeric" pattern="[0-9]*"
+                        class="form-control custom-pages-input" id="paginationInput" [value]="page"
+                        (keyup.enter)="selectPage(i.value)" (blur)="selectPage(i.value)"
+                        (input)="formatInput($any($event).target)"
+                        aria-labelledby="paginationInputLabel paginationDescription"
+                        style="width: 2.5rem" (keydown.Tab)="onKey($event);false;"/>
+                    <span id="paginationDescription" class="col-form-label text-nowrap px-2">
+                        / {{pages.length}}</span>
+                </div>
+            </li>
+        </ng-template>
+    </ngb-pagination>
+      </div>
+
+      <!-- End Pagination   -->
+
+    </div>
+  </div>
+  <!-- End footer -->
+
+
+</div>
+
+<!-- ----------------------FORM Nhập Hàng--------------->
+<!--Form Modal  == Dialog == popup show lên-->
+<div class="modal fade" tabindex="-1" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h2 class="modal-title" id="staticBackdropLabel">
+          <label for="" type="text">{{labelData}}</label>
+        </h2> -->
+        <label for="" style="font-size: 20px;">Tạo Đơn Nhập Hàng</label>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body">
+        <!-- FORM INPUT-->
+        <form [formGroup]="formValue">
+          <div class="row mb-3">
+            <div class="col-sm-9 format-form-group">
+              <label class="form-label">Tên Sách<i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+                  <input autocomplete = "off" type="text" formControlName="tensach" #names  class="form-control" name="tensach" list=names placeholder="Vui lòng lựa chọn sách!" #input
+                  [ngClass]="{
+                    'is-valid': (Dataform?.tensach?.valid && (Dataform?.tensach?.touched)),
+                    'is-invalid': (Dataform?.tensach?.invalid && (Dataform?.tensach?.touched))}">
+                  <datalist id="names" >
+                      <option *ngFor="let item of bookData" [value]="item.tensach">
+                  </datalist>
+
+              <div class="text-danger" *ngFor="let validation of validation_messages.tensach">
+                <div class="error-message mes-size"
+                  *ngIf="formValue.controls['tensach'].hasError(validation.type) && (formValue.controls['tensach'].dirty || formValue.controls['tensach'].touched)">
+                  {{validation.message}}</div>
+              </div>
+            </div>
+
+
+            <div class="col-sm-3 " style="    display: flex;flex-direction: column-reverse;align-items: flex-end;">
+              <button (click)="AddImportToList()" class="btn btn-success" style="width:70%">Thêm</button>
+            </div>
+
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-sm-6 format-form-group">
+              <label for="" class="form-label">Số Lượng <i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+              <input type="number" formControlName="soLuong" class="form-control" id="InputSoLuong"
+                placeholder="Vui lòng nhập vào chữ số!" pattern="[0-9]*" inputmode="numeric"
+                (input)="formatInput($any($event).target)" [ngClass]="{
+                  'is-valid': (Dataform?.soLuong?.valid && (Dataform?.soLuong?.touched)),
+                  'is-invalid': (Dataform?.soLuong?.invalid && (Dataform?.soLuong?.touched))}">
+                <div class="text-danger" *ngFor="let validation of validation_messages.soLuong">
+                  <div class="error-message mes-size"
+                    *ngIf="formValue.controls['soLuong'].hasError(validation.type) && (formValue.controls['soLuong'].dirty || formValue.controls['soLuong'].touched)">
+                    {{validation.message}}</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 format-form-group">
+              <label for="" class="form-label">Đơn Giá<i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+              <input type="number" formControlName="donGia" class="form-control" id="InputDonGia"
+                placeholder="Vui lòng nhập vào chữ số!" pattern="[0-9]*" inputmode="numeric"
+                (input)="formatInput($any($event).target)" [ngClass]="{
+                  'is-valid': (Dataform?.donGia?.valid && (Dataform?.donGia?.touched)),
+                  'is-invalid': (Dataform?.donGia?.invalid && (Dataform?.donGia?.touched))}">
+                <div class="text-danger" *ngFor="let validation of validation_messages.donGia">
+                  <div class="error-message mes-size"
+                    *ngIf="formValue.controls['donGia'].hasError(validation.type) && (formValue.controls['donGia'].dirty || formValue.controls['donGia'].touched)">
+                    {{validation.message}}</div>
+                </div>
+            </div>
+          </div>
+          <!-- END FORM INPUT -->
+          <!-- Table conN -->
+          <label for="" style="font-size: 20px;">Danh sách đơn hàng muốn nhập</label>
+          <table class="table table-striped ">
+
+            <thead>
+              <tr>
+                <th scope="col" for="">Tên sách&nbsp;</th>
+                <th scope="col" class="number-format">Số lượng&nbsp;</th>
+                <th scope="col" class="number-format">Đơn giá&nbsp;</th>
+                <th scope="col" class="number-format">Tổng tiền&nbsp;</th>
+                <th scope="col" class="number-format">Thao tác&nbsp;</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor=" let row of importList">
+                <td class="text-format">
+                  <div class="namebook-hover tensach-overflow" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                   >{{row.tensach}}</div>
+                </td>
+                <td class="number-format">{{row.soLuong}}</td>
+                <td class="number-format">{{row.donGia|number:'1.0-0'}}</td>
+                <td class="number-format">{{row.soLuong * row.donGia|number:'1.0-0'}}</td>
+                <td><button (click)="deleteRecordImp(row)" id="btnDelete" class="btn btn-danger"
+                    style="font-size: 10px;float:right">Xóa</button></td>
+              </tr>
+            </tbody>
+
+          </table>
+          <!-- end table con -->
+          <div style="float:right;">
+            <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal"
+              style="margin-right:15px" >Đóng</button>
+            <button (click)="CreateImportList()" (keydown.Tab)="onKey($event);false;" class="btn btn-success ">Thêm đơn hàng</button>
+          </div>
+          <div style="float:left;">
+            Tổng tiền đơn hàng nhập: {{sum|number:'1.0-0'}}
+          </div>
+        </form>
+        <!-- FORM -->
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- -----------------------------Form Xuất Hàng ------------>
+<!--Form Modal  == Dialog == popup show lên-->
+<div class="modal fade" tabindex="-1" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false"
+  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h2 class="modal-title" id="staticBackdropLabel">
+          <label for="" type="text">{{labelData}}</label>
+        </h2> -->
+        <label for="" style="font-size: 20px;">Tạo Đơn Xuất Hàng</label>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body">
+        <!-- FORM EXPORT-->
+        <form [formGroup]="formXuatHang">
+          <div class="row mb-3">
+            <div class="col-sm-9 format-form-group">
+              <label class="form-label">Tên Sách<i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+                  <input autocomplete = "off" type="text" formControlName="tensach" #names  class="form-control" name="tensach" list=names placeholder="Vui lòng lựa chọn sách!" #input
+                  [ngClass]="{
+                    'is-valid': (DataformEX?.tensach?.valid && (DataformEX?.tensach?.touched)),
+                    'is-invalid': (DataformEX?.tensach?.invalid && (DataformEX?.tensach?.touched))}">
+                  <datalist id="names" >
+                      <option *ngFor="let item of bookData" [value]="item.tensach">
+                  </datalist>
+              <div class="text-danger" *ngFor="let validation of validation_messages.tensach">
+                <div class="error-message mes-size"
+                  *ngIf="formXuatHang.controls['tensach'].hasError(validation.type) && (formXuatHang.controls['tensach'].dirty || formXuatHang.controls['tensach'].touched)">
+                  {{validation.message}}</div>
+              </div>
+            </div>
+
+            <div class="col-sm-3 " style="    display: flex;flex-direction: column-reverse;align-items: flex-end;">
+              <button (click)="AddExportToList()" class="btn btn-success" style="width:70%">Thêm</button>
+            </div>
+
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-sm-6 format-form-group">
+              <label for="" class="form-label">Số Lượng <i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+              <input type="number" formControlName="soLuong" class="form-control" id="InputSoLuong"
+                placeholder="Vui lòng nhập vào chữ số!" pattern="[0-9]*" inputmode="numeric"
+                (input)="formatInput($any($event).target)"  [ngClass]="{
+                  'is-valid': (DataformEX?.soLuong?.valid && (DataformEX?.soLuong?.touched)),
+                  'is-invalid': (DataformEX?.soLuong?.invalid && (DataformEX?.soLuong?.touched))}">
+
+                <div class="text-danger" *ngFor="let validation of validation_messages.soLuong">
+                  <div class="error-message mes-size"
+                    *ngIf="formXuatHang.controls['soLuong'].hasError(validation.type) && (formXuatHang.controls['soLuong'].dirty || formXuatHang.controls['soLuong'].touched)">
+                    {{validation.message}}</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 format-form-group">
+              <label for="" class="form-label">Đơn Giá<i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+              <input type="number" formControlName="donGia" class="form-control" id="InputDonGia"
+                placeholder="Vui lòng nhập vào chữ số!" pattern="[0-9]*" inputmode="numeric"
+                (input)="formatInput($any($event).target)" [ngClass]="{
+                  'is-valid': (DataformEX?.donGia?.valid && (DataformEX?.donGia?.touched)),
+                  'is-invalid': (DataformEX?.donGia?.invalid && (DataformEX?.donGia?.touched))}">
+                <div class="text-danger" *ngFor="let validation of validation_messages.donGia">
+                  <div class="error-message mes-size"
+                    *ngIf="formXuatHang.controls['donGia'].hasError(validation.type) && (formXuatHang.controls['donGia'].dirty || formXuatHang.controls['donGia'].touched)">
+                    {{validation.message}}</div>
+                </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-4 format-form-group">
+              <label for="" class="form-label">Tên Người Nhận <i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+              <input type="text" formControlName="tenNguoiNhan" class="form-control" id="inputtenNguoiNhan"
+                placeholder="Vui lòng nhập vào người nhận!" [ngClass]="{
+                  'is-valid': (DataformEX?.tenNguoiNhan?.valid && (DataformEX?.tenNguoiNhan?.touched)),
+                  'is-invalid': (DataformEX?.tenNguoiNhan?.invalid && (DataformEX?.tenNguoiNhan?.touched))}">
+
+                <div class="text-danger" *ngFor="let validation of validation_messages.tenNguoiNhan">
+                  <div class="error-message mes-size"
+                    *ngIf="formXuatHang.controls['tenNguoiNhan'].hasError(validation.type) && (formXuatHang.controls['tenNguoiNhan'].dirty || formXuatHang.controls['tenNguoiNhan'].touched)">
+                    {{validation.message}}</div>
+                </div>
+
+            </div>
+
+            <div class="col-sm-4 format-form-group">
+              <label for="" class="form-label">Địa Chỉ<i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+              <input type="text" formControlName="diaChi" class="form-control" id="inputdiaChi"
+                placeholder="Vui lòng nhập vào địa chỉ!" [ngClass]="{
+                  'is-valid': (DataformEX?.diaChi?.valid && (DataformEX?.diaChi?.touched)),
+                  'is-invalid': (DataformEX?.diaChi?.invalid && (DataformEX?.diaChi?.touched))}">
+                <div class="text-danger" *ngFor="let validation of validation_messages.diaChi">
+                  <div class="error-message mes-size"
+                    *ngIf="formXuatHang.controls['diaChi'].hasError(validation.type) && (formXuatHang.controls['diaChi'].dirty || formXuatHang.controls['diaChi'].touched)">
+                    {{validation.message}}</div>
+                </div>
+            </div>
+            <div class="col-sm-4 format-form-group">
+              <label for="" class="form-label">Số Điện Thoại<i class="fa fa-asterisk icon-note icon-note-format"
+                  aria-hidden="true"></i></label>
+              <input type="number" formControlName="soDienThoai" class="form-control" id="inputsoDienThoai"
+                placeholder="Vui lòng nhập vào SĐT!" pattern="[0-9]*" (input)="formatInput($any($event).target)" [ngClass]="{
+                  'is-valid': (DataformEX?.soDienThoai?.valid && (DataformEX?.soDienThoai?.touched)),
+                  'is-invalid': (DataformEX?.soDienThoai?.invalid && (DataformEX?.soDienThoai?.touched))}">
+                <div class="text-danger" *ngFor="let validation of validation_messages.soDienThoai">
+                  <div class="error-message mes-size"
+                    *ngIf="formXuatHang.controls['soDienThoai'].hasError(validation.type) && (formXuatHang.controls['soDienThoai'].dirty || formXuatHang.controls['soDienThoai'].touched)">
+                    {{validation.message}}</div>
+                </div>
+            </div>
+          </div>
+
+          <!-- Table con import -->
+          <label for="" style="font-size: 20px;">Danh sách đơn hàng muốn xuất</label>
+          <table class="table table-striped ">
+
+            <thead>
+              <tr>
+                <th scope="col" for="">Tên sách&nbsp;</th>
+                <th scope="col" class="number-format">Số lượng&nbsp;</th>
+                <th scope="col" class="number-format">Đơn giá&nbsp;</th>
+                <th scope="col" class="number-format">Tổng tiền&nbsp;</th>
+                <th scope="col" class="number-format">Thao tác&nbsp;</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let item of exportList">
+                <td class="text-format">
+                  <div class="namebook-hover tensach-overflow" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                   >{{item.tensach}}</div>
+                </td>
+                <td class="number-format">{{item.soLuong}}</td>
+                <td class="number-format" >{{item.donGia|number:'1.0-0'}}</td>
+                <td class="number-format">{{item.donGia*item.soLuong|number:'1.0-0'}}</td>
+                <td><button (click)="deleteRecordEx(item)" class="btn btn-danger"
+                    style="font-size: 10px;float:right">Xóa</button></td>
+              </tr>
+            </tbody>
+
+          </table>
+          <div style="float:right;">
+            <button type="button" id="cancelEx" class="btn btn-secondary" data-bs-dismiss="modal"
+              style="margin-right:15px">Đóng</button>
+            <button (click)="CreateExportList()" class="btn btn-success"(keydown.Tab)="onKey($event);false;">Xuất đơn hàng</button>
+          </div>
+          <div style="float:left;">
+            Tổng tiền đơn hàng xuất: {{sumE|number:'1.0-0'}}
+          </div>
+        </form>
+        <!-- FORM -->
+      </div>
+
+    </div>
+  </div>

@@ -1,0 +1,273 @@
+<div style="padding: 0px 12px 0px 12px;">
+  <h2>Thống kê doanh thu theo lợi nhuận</h2>
+  <div style="display: block">
+    <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions"
+      [legend]="barChartLegend" [chartType]="barChartType">
+    </canvas>
+  </div>
+  <!-- <button mat-button mat-raised-button color="primary" (click)="randomize()">Update</button> -->
+</div>
+<!-- Table Doanh Thu Lợi Nhuận Theo Sản Phẩm -->
+<div style="padding: 0px 12px 0px 12px;">
+  <hr>
+</div>
+<div class="navbar navbar-light overflow-group-a">
+  <h2 >Thống kê doanh thu theo từng sản phẩm</h2>
+  <div style=" display: flex; justify-content: space-between; width: 100%;">
+
+    <!-- search -->
+    <div class="form-search-a">
+
+      <input id="input-form" type="text" class="form-control form-control-underlined" placeholder="Hãy nhập vào giá trị cần tìm kiếm"
+      (input)="searchProduct(key1.value)" #key1="ngModel"  ngModel name="key1" #input>
+      <i class="fa fa-times icon-search" type="button" onclick="document.getElementById('input-form').value = ''"
+        (click)="resetTable()">
+      </i>
+      <!-- <i class="fa fa-search icon-search"></i> -->
+
+    </div>
+    <!-- buntton add -->
+  </div>
+</div>
+
+
+
+<div class=" form-group overflow-group-a container-fluid">
+
+  <table class="table table-striped ">
+
+    <thead style="background-color: rgb(235,205,171);">
+      <tr>
+        <th scope="col" for="" style="width:300px">Tên sách&nbsp;</th>
+        <th scope="col" class="number-format">Số lượng bán ra</th>
+        <th scope="col" class="number-format">Doanh thu</th>
+        <th scope="col" class="number-format">Lợi nhuận</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor=" let row of listData | slice: (page-1) * pageSize : page * pageSize ">
+        <td class="text-format">
+          <div class="namebook-hover tensach-overflow300" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+            tooltipClass="my-custom-class" ngbTooltip={{row[0]}}>{{row[0]}}</div>
+        </td>
+        <td class="number-format">{{row[1]}}</td>
+        <td class="number-format">{{row[2]|number:'1.0-0'}}</td>
+        <td class="number-format">{{row[3]|number:'1.0-0'}}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+
+  <!-- Star footer -->
+  <div class="form-footer-a">
+    <!--START Show Item -->
+    <div class="row no-container">
+      <div class="col">
+
+        <div *ngIf="listData && listData.length != 0" class="show-item-padding">
+          <label class="form-check-label">Hiển thị
+            <select [(ngModel)]="pageSize">
+              <option [value]="5">5</option>
+              <option [value]="10">10</option>
+              <option [value]="15">15</option>
+              <option [value]="listData.length">tất cả</option>
+
+            </select>
+          </label>
+        </div>
+
+      </div>
+      <!-- <div >Trang hiện tại: {{page}}</div> -->
+    </div>
+    <!--END Show Item -->
+
+    <div class="group-show-pagination-format">
+      <!--Start Showing -->
+      <div class="form-showing-a">
+        <div *ngIf="totalLength - (page * pageSize - pageSize +1) >= pageSize then content1 else content2">
+        </div>
+        <div>
+          <div>
+            <ng-template #content1 style="font-weight:bold; ">Đang hiện {{page*pageSize - pageSize+1}}
+              đến
+              {{page*pageSize}} của {{listData.length}} đơn vị
+            </ng-template>
+          </div>
+        </div>
+
+        <ng-template #content2>Đang hiện {{page*pageSize-pageSize+1}} đến {{totalLength}} của {{totalLength}}
+          đơn vị
+        </ng-template>
+        <div *ngIf="listData && listData.length == 0">
+          <p>Không có mục hiển thị nào!</p>
+        </div>
+      </div>
+      <!--End Showing -->
+
+      <!--Start Pagination  -->
+      <div>
+        <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="totalLength" [boundaryLinks]="true">
+          <ng-template ngbPaginationPages let-page let-pages="pages">
+            <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+              <div class="form-group d-flex flex-nowrap px-2">
+                <label id="paginationInputLabel" for="paginationInput" class="col-form-label mr-2 ml-1">Trang</label>
+                <input #i type="text" inputmode="numeric" pattern="[0-9]*" class="form-control custom-pages-input"
+                  id="paginationInput" [value]="page" (keyup.enter)="selectPage(i.value)" (blur)="selectPage(i.value)"
+                  (input)="formatInput($any($event).target)"
+                  aria-labelledby="paginationInputLabel paginationDescription" style="width: 2.5rem" />
+                <span id="paginationDescription" class="col-form-label text-nowrap px-2">
+                  / {{pages.length}}</span>
+              </div>
+            </li>
+          </ng-template>
+        </ngb-pagination>
+      </div>
+
+      <!-- End Pagination   -->
+
+    </div>
+  </div>
+  <!-- End footer -->
+
+
+</div>
+<!-- Table Chi Tiết -->
+<div class="padding-rl-13">
+  <hr>
+</div>
+<div class="navbar navbar-light overflow-group-a">
+  <h2 >Thống kê theo đơn hàng</h2>
+  <div style=" display: flex; justify-content: space-between; width: 100%;">
+
+    <!-- search -->
+    <div class="form-search-a">
+
+      <input id="input-form" type="text" class="form-control form-control-underlined" placeholder="Hãy nhập vào giá trị cần tìm kiếm" name="bookFilter"
+      (input)="searchImports(key.value)" #key="ngModel"  ngModel name="key">
+      <i class="fa fa-times icon-search" type="button" onclick="document.getElementById('input-form').value = ''"
+        (click)="resetTable()">
+      </i>
+      <!-- <i class="fa fa-search icon-search"></i> -->
+
+    </div>
+    <!-- buntton add -->
+  </div>
+</div>
+
+
+
+<div style="display: flex; justify-content: space-between; width: 100%;" class="container-fluid">
+  <div>
+    <button (click)="getListDetailsImport()" type="button" class="button-list  mg-right10" id="btnListI"><span>Nhập
+        hàng</span></button>
+    <button (click)="getListDetailsExport()" type="button" class="button-list  mg-right10" id="btnListE"
+      data-bs-target="#staticBackdrop"><span>Xuất hàng</span> </button>
+  </div>
+</div>
+
+
+<div class=" form-group overflow-group-a container-fluid">
+
+  <table class="table table-striped ">
+
+    <thead style="background-color: rgb(235,205,171);">
+      <tr>
+        <th scope="col" for="" style="width:400px">Tên sách&nbsp;</th>
+        <th scope="col" class="number-format">
+          <div>Số lượng {{statusIE}}</div>
+        </th>
+        <th scope="col" class="number-format">Đơn giá</th>
+        <th scope="col" class="number-format">Ngày {{statusIE}} hàng</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor=" let row of listDetails | slice: (pageE-1) * pageSizeE : pageE * pageSizeE ">
+        <td class="text-format">
+          <div class="namebook-hover tensach-overflow300" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+            tooltipClass="my-custom-class" ngbTooltip={{row[0]}}>{{row[0]}}</div>
+        </td>
+        <td class="number-format">{{row[1]}}</td>
+        <td class="number-format">{{row[2]|number:'1.0-0'}}</td>
+        <td class="number-format">{{row[3]}}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+
+  <!-- Star footer -->
+  <div class="form-footer-a">
+    <!--START Show Item -->
+    <div class="row no-container">
+      <div class="col">
+
+        <div *ngIf="listDetails && listDetails.length != 0" class="show-item-padding">
+          <label class="form-check-label">Hiển thị
+            <select [(ngModel)]="pageSizeE">
+              <option [value]="5">5</option>
+              <option [value]="10">10</option>
+              <option [value]="15">15</option>
+              <option [value]="listDetails.length">tất cả</option>
+
+            </select>
+          </label>
+        </div>
+
+      </div>
+      <!-- <div >Trang hiện tại: {{page}}</div> -->
+    </div>
+    <!--END Show Item -->
+
+    <div class="group-show-pagination-format">
+      <!--Start Showing -->
+      <div class="form-showing-a">
+        <div *ngIf="totalLengthE - (pageE * pageSizeE - pageSizeE +1) >= pageSizeE then content1E else content2E">
+        </div>
+        <div>
+          <div>
+            <ng-template #content1E style="font-weight:bold; ">Đang hiện {{pageE*pageSizeE - pageSizeE+1}}
+              đến
+              {{pageE*pageSizeE}} của {{listDetails.length}} đơn vị
+            </ng-template>
+          </div>
+        </div>
+
+        <ng-template #content2E>Đang hiện {{pageE*pageSizeE-pageSizeE+1}} đến {{totalLengthE}} của {{totalLengthE}}
+          đơn vị
+        </ng-template>
+        <div *ngIf="listDetails && listDetails.length == 0">
+          <p>Không có mục hiển thị nào!</p>
+        </div>
+      </div>
+      <!--End Showing -->
+
+      <!--Start Pagination  -->
+      <div>
+        <ngb-pagination [(page)]="pageE" [pageSize]="pageSizeE" [collectionSize]="totalLengthE" [boundaryLinks]="true">
+          <ng-template ngbPaginationPages let-page let-pages="pages">
+            <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+              <div class="form-group d-flex flex-nowrap px-2">
+                <label id="paginationInputLabel" for="paginationInput" class="col-form-label mr-2 ml-1">Trang</label>
+                <input #i type="text" inputmode="numeric" pattern="[0-9]*" class="form-control custom-pages-input"
+                  id="paginationInput" [value]="pageE" (keyup.enter)="selectPage(i.value)" (blur)="selectPage(i.value)"
+                  (input)="formatInput($any($event).target)"
+                  aria-labelledby="paginationInputLabel paginationDescription" style="width: 2.5rem" (keydown.Tab)="onKey($event);false;"/>
+                <span id="paginationDescription" class="col-form-label text-nowrap px-2">
+                  / {{pages.length}}</span>
+              </div>
+            </li>
+          </ng-template>
+        </ngb-pagination>
+      </div>
+
+      <!-- End Pagination   -->
+
+    </div>
+  </div>
+  <!-- End footer -->
+
+
+</div>

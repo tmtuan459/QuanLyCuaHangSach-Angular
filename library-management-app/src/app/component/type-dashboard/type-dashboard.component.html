@@ -1,0 +1,308 @@
+<div class="navbar navbar-light overflow-group-a" style="position: relative;">
+
+  <h1 class="" style="margin-top:40xp;width:100%;text-align:center">Quản lý thể loại sách</h1>
+
+  <div style=" display: flex; justify-content: space-between; width: 100%; ">
+
+
+    <!-- search -->
+    <div class="form-search-a">
+
+      <input id="input-form" type="search" class="form-control" placeholder="Hãy nhập vào giá trị cần tìm kiếm" name="theLoaiFilter"
+      (input)="searchTypes(key.value)" #key="ngModel"  ngModel name="key" #input>
+      <i class="fa fa-times icon-search" type="button" onclick="document.getElementById('input-form').value = ''"
+        (click)="ngOnInit()">
+      </i>
+
+
+    </div>
+    <!-- buntton add -->
+    <div>
+      <button (click)="ClickAddType()" type="button" class="btn btn-success" data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop">Thêm thể loại mới  </button>
+    </div>
+
+
+  </div>
+
+</div>
+<!-- Table -->
+
+<div class=" form-group overflow-group-a container-fluid">
+
+  <table class="table table-striped ">
+
+    <thead style="background-color: rgb(235,205,171);">
+      <tr>
+        <th  scope="col" for="">Tên thể loại&nbsp;</th>
+        <th  scope="col" class="number-format" style="text-align:center">Ghi chú&nbsp;</th>
+        <th scope="col" style="text-align:center">Thao tác</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr
+        *ngFor=" let row of typeData | slice: (page-1) * pageSize : page * pageSize  ">
+        <td class="text-format">
+          <div class="namebook-hover tensach-overflow" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+          tooltipClass="my-custom-class" ngbTooltip={{row.tenTheLoai}}>{{row.tenTheLoai}}</div>
+        </td>
+        <td class="text-format ">
+          <div class="ghiChu-overflow" tooltipClass="my-custom-class" ngbTooltip={{row.ghiChu}}>{{row.ghiChu}}</div>
+
+        </td>
+        <td class="button-format">
+          <button data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-info"
+            (click)="detailType(row)">Xem</button>
+          <button data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-success"
+            (click)="editType(row)">Sửa</button>
+          <button (click)="deleteType(row)" class="btn btn-danger">Xóa</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <!-- Star footer -->
+  <div class="form-footer-a">
+    <!--START Show Item -->
+    <div class="row no-container">
+      <div class="col">
+
+        <div *ngIf="typeData && typeData.length != 0" class="show-item-padding">
+          <label class="form-check-label">Hiển thị
+            <select [(ngModel)]="pageSize">
+              <option [value]="5">5</option>
+              <option [value]="10">10</option>
+              <option [value]="15">15</option>
+              <option [value]="typeData.length">tất cả</option>
+
+            </select>
+          </label>
+        </div>
+
+      </div>
+      <!-- <div >Trang hiện tại: {{page}}</div> -->
+    </div>
+    <!--END Show Item -->
+
+    <div class="group-show-pagination-format">
+      <!--Start Showing -->
+      <div class="form-showing-a">
+        <div *ngIf="totalLength - (page * pageSize - pageSize +1) >= pageSize then content1 else content2">
+        </div>
+        <div>
+          <div>
+            <ng-template #content1 style="font-weight:bold; ">Đang hiện {{page*pageSize - pageSize+1}}
+              đến
+              {{page*pageSize}} của {{typeData.length}} đơn vị
+            </ng-template>
+          </div>
+        </div>
+
+        <ng-template #content2>Đang hiện {{page*pageSize-pageSize+1}} đến {{totalLength}} của {{totalLength}}
+          đơn vị
+        </ng-template>
+        <div *ngIf="typeData && typeData.length == 0">
+          <p>Không có mục hiển thị nào!</p>
+        </div>
+      </div>
+      <!--End Showing -->
+
+     <!--Start Pagination  -->
+     <div>
+      <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="totalLength"
+      [boundaryLinks]="true">
+      <ng-template ngbPaginationPages let-page let-pages="pages">
+          <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+              <div class="form-group d-flex flex-nowrap px-2">
+                  <label id="paginationInputLabel" for="paginationInput"
+                      class="col-form-label mr-2 ml-1">Trang</label>
+                  <input #i type="text" inputmode="numeric" pattern="[0-9]*"
+                      class="form-control custom-pages-input" id="paginationInput" [value]="page"
+                      (keyup.enter)="selectPage(i.value)" (blur)="selectPage(i.value)"
+                      (input)="formatInput($any($event).target)"
+                      aria-labelledby="paginationInputLabel paginationDescription"
+                      style="width: 2.5rem" (keydown.Tab)="onKey($event);false;"/>
+                  <span id="paginationDescription" class="col-form-label text-nowrap px-2">
+                      / {{pages.length}}</span>
+              </div>
+          </li>
+      </ng-template>
+  </ngb-pagination>
+    </div>
+
+    <!-- End Pagination   -->
+
+    </div>
+  </div>
+  <!-- End footer -->
+
+
+</div>
+
+<!--Form Modal  == Dialog == popup show lên-->
+<div class="modal fade" tabindex="-1" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="staticBackdropLabel">
+          <label for="" type="text">{{labelData}}</label>
+        </h2>
+
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body">
+        <!-- FORM -->
+        <form [formGroup]="formValue">
+
+          <div class="mb-3 format-form-group">
+            <label for="" class="form-label">Tên thể loại<i class="fa fa-asterisk icon-note icon-note-format"
+                aria-hidden="true"></i></label>
+            <input type="text" formControlName="tenTheLoai" class="form-control" id="InputTenTheLoai"
+              placeholder="Vui lòng nhập vào tên sách!" #input [ngClass]="{
+                'is-valid': (Dataform?.tenTheLoai?.valid && (Dataform?.tenTheLoai?.touched)),
+                'is-invalid': (Dataform?.tenTheLoai?.invalid && (Dataform?.tenTheLoai?.touched))}">
+
+            <div class="text-danger" *ngFor="let validation of validation_messages.tenTheLoai">
+              <div class="error-message mes-size"
+                *ngIf="formValue.controls['tenTheLoai'].hasError(validation.type) && (formValue.controls['tenTheLoai'].dirty || formValue.controls['tenTheLoai'].touched)">
+                {{validation.message}}</div>
+            </div>
+
+          </div>
+
+
+          <div class="mb-3 format-form-group">
+            <label classfor="" class="form-label">Ghi chú<i class="fa fa-asterisk icon-note icon-note-format"
+                aria-hidden="true"></i></label>
+            <textarea classfortype="text" formControlName="ghiChu" class="form-control" id="InputGhiChu"
+              placeholder="Vui lòng nhập vào năm xuất bản!" style="height:100px"></textarea>
+
+            <div class="text-danger" *ngFor="let validation of validation_messages.ghiChu">
+              <div class="error-message mes-size"
+                *ngIf="formValue.controls['ghiChu'].hasError(validation.type) && (formValue.controls['ghiChu'].dirty || formValue.controls['ghiChu'].touched)">
+                {{validation.message}}</div>
+            </div>
+
+          </div>
+          <hr>
+          <!-- Table conN -->
+          <div  *ngIf="showTableCon">
+            <label for="" style="font-size: 20px;">Sách cùng thể loại</label>
+          <table class="table table-striped ">
+
+            <thead style="background-color: rgb(235,205,171);">
+              <tr>
+                <th scope="col" for="">Tên sách&nbsp;</th>
+                <th scope="col" class="text-format">Thể loại&nbsp;</th>
+                <th scope="col" class="number-format">Năm xuất bản&nbsp;</th>
+                <th scope="col" class="text-format">Nhà xuất bản&nbsp;</th>
+
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor=" let row of typeDataById | slice: (pageTC-1) * pageSizeTC : pageTC * pageSizeTC">
+                <td class="text-format">
+                  <div class="namebook-hover tensach-overflow" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                    tooltipClass="my-custom-class" ngbTooltip={{row.tensach}}>{{row.tensach}}</div>
+                </td>
+                <td class="text-format">{{row.theLoai.tenTheLoai}}</td>
+                <td class="number-format">{{row.namXB}}</td>
+                <td class="text-format">{{row.nhaXB}}</td>
+              </tr>
+            </tbody>
+
+          </table>
+            <!-- Star footer -->
+            <div class="form-footer-a">
+              <!--START Show Item -->
+              <div class="row no-container">
+                <div class="col">
+                  <!-- <div *ngIf="authorDataById && authorDataById.length != 0" class="show-item-padding">
+                    <label class="form-check-label">Hiển thị
+                      <select [(ngModel)]="pageSizeTC">
+                        <option [value]="5">5</option>
+                        <option [value]="10">10</option>
+                        <option [value]="15">15</option>
+                        <option [value]="authorDataById.length">tất cả</option>
+
+                      </select>
+                    </label>
+                  </div> -->
+
+                </div>
+              </div>
+              <!--END Show Item -->
+
+              <div class="group-show-pagination-format">
+               <!--Start Showing -->
+               <div class="form-showing-a">
+                <div *ngIf="totalLengthTC - (pageTC * pageSizeTC - pageSizeTC +1) >= pageSizeTC then content3 else content4">
+                </div>
+                <div>
+                  <div>
+                    <ng-template #content3 style="font-weight:bold; ">Đang hiện {{pageTC*pageSizeTC - pageSizeTC+1}}
+                      đến
+                      {{pageTC*pageSizeTC}} của {{typeDataById.length}} đơn vị
+                    </ng-template>
+                  </div>
+                </div>
+
+                <ng-template #content4>Đang hiện {{pageTC*pageSizeTC-pageSizeTC+1}} đến {{totalLengthTC}} của {{totalLengthTC}}
+                  đơn vị
+                </ng-template>
+                <div *ngIf="typeDataById && typeDataById.length == 0">
+                  <p>Không có mục hiển thị nào!</p>
+                </div>
+              </div>
+              <!--End Showing -->
+
+                <!--Start Pagination  -->
+                <div>
+                  <ngb-pagination [(page)]="pageTC" [pageSize]="pageSizeTC" [collectionSize]="totalLengthTC"
+                    [boundaryLinks]="true">
+                    <ng-template ngbPaginationPages let-page let-pages="pages">
+                      <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+                        <div class="form-group d-flex flex-nowrap px-2">
+                          <label id="paginationInputLabel" for="paginationInput"
+                            class="col-form-label mr-2 ml-1">Trang</label>
+                          <input #i type="text" inputmode="numeric" pattern="[0-9]*"
+                            class="form-control custom-pages-input" id="paginationInput" [value]="pageTC"
+                            (keyup.enter)="selectPageTC(i.value)" (blur)="selectPageTC(i.value)"
+                            (input)="formatInput2($any($event).target)"
+                            aria-labelledby="paginationInputLabel paginationDescription" style="width: 2.5rem"
+                             />
+                          <span id="paginationDescription" class="col-form-label text-nowrap px-2">
+                            / {{pages.length}}</span>
+                        </div>
+                      </li>
+                    </ng-template>
+                  </ngb-pagination>
+                </div>
+
+                <!-- End Pagination   -->
+
+              </div>
+            </div>
+            <!-- End footer -->
+          </div>
+
+          <!-- end table con -->
+
+
+        </form>
+        <!-- FORM -->
+      </div>
+      <div class="modal-footer">
+        <button (click)="postTypeDetails()" type="button" *ngIf="showButtonAdd" class="btn btn-success">Thêm</button>
+        <button (click)="updateTypeDetails()" type="button" *ngIf="showButtonUpdate" class="btn btn-success">Cập
+          nhật</button>
+        <button (keydown.Tab)="onKey($event);false;" type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+
+      </div>
+    </div>
+  </div>
+</div>
