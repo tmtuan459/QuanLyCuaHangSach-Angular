@@ -1,3 +1,4 @@
+
 <div class="navbar navbar-light overflow-group-a">
   <h1 class="" style="margin-top:40xp;width:100%;text-align:center">Quản lý sách</h1>
   <div style=" display: flex; justify-content: space-between; width: 100%;">
@@ -7,18 +8,17 @@
 
       <input appAutoFocusDirective id="input-form" type="search" class="form-control form-control-underlined"
         placeholder="Hãy nhập vào giá trị cần tìm kiếm" (input)="searchBooks(key.value)" #key="ngModel" ngModel
-        name="key" #input (keyup.ShiftTab)="onKey($event);false;">
+        name="key" #input >
       <i class="fa fa-times icon-search" type="button" onclick="document.getElementById('input-form').value = ''"
         (click)="ngOnInit()">
       </i>
-
 
     </div>
 
     <!-- buntton add -->
     <div>
       <button (click)="ClickAddBook()" type="button" class="btn btn-success" data-bs-toggle="modal"
-        data-bs-target="#staticBackdrop">Thêm sách mới</button>
+        data-bs-target="#staticBackdrop" #myModalBox>Thêm sách mới</button>
     </div>
 
 
@@ -31,7 +31,7 @@
 
     <thead style="background-color: rgb(235,205,171);">
       <tr>
-        <th scope="col" for="">Tên sách&nbsp;</th>
+        <th scope="col" for="" >Tên sách&nbsp;<i class="fa fa-times icon-search" ></i></th>
         <th scope="col">Thể loại&nbsp;</th>
         <th scope="col">Tác giả&nbsp;</th>
         <th scope="col" class="number-format">Năm xuất bản&nbsp;
@@ -116,18 +116,35 @@
       <!--Start Showing -->
 
       <div class="form-showing-a">
-        <!-- <div *ngIf="totalLength - (page * pageSize - pageSize +1) >= pageSize then content1 else content2">
-        </div> -->
-        <ng-template ngIf="page * pageSize >= totalLength && totalLength != 0" style="font-weight:bold; ">
-          Đang hiện {{page*pageSize - pageSize+1}} đến {{page*pageSize}} của {{bookData.length}} đơn vị
+        <label *ngIf=" bookData?.length==0">Đang hiện 0 sản phẩm</label>
+        <label *ngIf="page==1&&(page*pageSize)<totalLength && bookData?.length!=0">Hiển thị: 1 - {{page*pageSize}} trên
+          {{totalLength}} sản phẩm</label>
+      <label *ngIf="page!=1&&(page*pageSize)<totalLength && bookData?.length!=0">Hiển thị: {{((page-1)*pageSize)+1}} -
+          {{page*pageSize}} trên
+          {{totalLength}} sản phẩm</label>
+      <label *ngIf="page!=1&&(page*pageSize)>totalLength && bookData?.length!=0">Hiển thị: {{((page-1)*pageSize)+1}} -
+          {{totalLength}} trên
+          {{totalLength}} sản phẩm</label>
+      <label *ngIf="page==1&&(page*pageSize)>totalLength && bookData?.length!=0">Hiển thị: 1 - {{totalLength}} trên
+          {{totalLength}} sản phẩm</label>
+
+        <!-- <ng-template ngIf="page==1 && (page*pageSize) < totalLength && bookData?.length!=0" style="font-weight:bold; ">
+          Đang hiện {{page*pageSize - pageSize+1}} đến {{totalLength}} của {{totalLength}} đơn vị
+        </ng-template> -->
+
+        <!-- <ng-template *ngIf="page!=1 && (page*pageSize) < totalLength && bookData?.length!=0">
+          Đang hiện {{((page-1)*pageSize)+1}} -{{totalLength}} trên {{totalLength}} sản phẩm
         </ng-template>
 
-        <ng-template ngIf="totalLength - (page * pageSize - pageSize +1) < pageSize ">
-          Đang hiện {{page*pageSize-pageSize+1}} đến {{totalLength}} của {{totalLength}} đơn vị
+        <ng-template *ngIf="page!=1&&(page*pageSize)>=totalLength && bookData?.length!=0">
+          Hiển thị:{{((page-1)*pageSize)+1}} -{{totalLength}} trên{{totalLength}} sản phẩm
         </ng-template>
 
-        <ng-template ngIf="totalLength == 0">Đang hiện 0 sản phẩm
-        </ng-template>
+        <ng-template *ngIf="page==1&&(page*pageSize)>totalLength && bookData?.length!=0">
+          Hiển thị: 1 - {{totalLength}}trên{{totalLength}} sản phẩm
+        </ng-template> -->
+
+
 
       </div>
       <!--End Showing -->
@@ -187,7 +204,7 @@
 
 
 <!--Form Modal  == Dialog == popup show lên-->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+<div class="modal fade" tabindex="-1" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
   aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -205,8 +222,8 @@
           <div class="mb-3 format-form-group">
             <label for="" class="form-label">Tên sách <i class="fa fa-asterisk icon-note icon-note-format"
                 aria-hidden="true"></i></label>
-            <input appAutoFocusDirective type="text" formControlName="tensach" class="form-control" id="InputTenSach"
-              placeholder="Vui lòng nhập vào tên sách!" #input [ngClass]="{
+            <input  type="text" tabindex="-1" autofocus formControlName="tensach" class="form-control" id="InputTenSach"
+              placeholder="Vui lòng nhập vào tên sách!" [ngClass]="{
                 'is-valid': (Dataform?.tensach?.valid && (Dataform?.tensach?.touched)),
                 'is-invalid': (Dataform?.tensach?.invalid && (Dataform?.tensach?.touched))}">
 
@@ -260,12 +277,10 @@
                   aria-hidden="true"></i></label>
 
               <input autocomplete="off" type="text" formControlName="theLoaiId" #types class="form-control"
-                name="theLoaiId" list=types placeholder="Vui lòng lựa chọn thể loại!"
-
-                [ngClass]="{
+                name="theLoaiId" list=types placeholder="Vui lòng lựa chọn thể loại!" [ngClass]="{
                   'is-valid': (Dataform?.theLoaiId?.valid && (Dataform?.theLoaiId?.touched)),
                   'is-invalid': (Dataform?.theLoaiId?.invalid && (Dataform?.theLoaiId?.touched))}">
-                  <!-- ngClass check form valid,if !valid chang css form red -->
+              <!-- ngClass check form valid,if !valid chang css form red -->
               <datalist id="types">
                 <option *ngFor="let item of type" [value]="item.tenTheLoai">
               </datalist>
@@ -323,7 +338,7 @@
         <!-- FORM -->
       </div>
       <div class="modal-footer">
-        <button type="submit" *ngIf="showButtonAdd" (click)="postBookDetails()" class="btn btn-success">Thêm</button>
+        <button  type="submit" *ngIf="showButtonAdd" (click)="postBookDetails()" class="btn btn-success">Thêm</button>
         <button type="button" *ngIf="showButtonUpdate" (click)="updateBookDetails()" class="btn btn-success">Cập
           nhật</button>
         <button (keydown.Tab)="onKey($event);false;" type="button" id="cancel" class="btn btn-secondary"
@@ -333,3 +348,5 @@
     </div>
   </div>
 </div>
+
+

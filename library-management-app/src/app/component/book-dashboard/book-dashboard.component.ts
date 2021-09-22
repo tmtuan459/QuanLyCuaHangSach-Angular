@@ -1,7 +1,8 @@
+
 import { Observable } from 'rxjs';
 import { Type } from '../../dto/type';
 import { BookService } from '../../service/book.service';
-import { Component, OnInit, ElementRef, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, Input, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Book } from '../../dto/book';
 import { Author } from '../../dto/author';
@@ -12,6 +13,7 @@ import { error } from '@angular/compiler/src/util';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from 'src/app/service/message.service';
 import Swal from 'sweetalert2';
+import * as $ from "jquery";
 
 
 
@@ -25,6 +27,7 @@ import Swal from 'sweetalert2';
 export class BookDashboardComponent implements OnInit {
   // autofocus and tab
   @ViewChild('input') input: ElementRef;
+
 
 
   id: number;
@@ -77,6 +80,7 @@ export class BookDashboardComponent implements OnInit {
     //   tacGia : [''],
     //   gioiThieu : [''],
     // })
+
 
 
     this.formValue = this.fb.group({
@@ -148,7 +152,7 @@ export class BookDashboardComponent implements OnInit {
     console.log(event.key);​
     if (event.key === 'Tab') {​
     this.input.nativeElement.focus();
-        }​
+    }​
  }​
   validateAllFormFields(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(field => {
@@ -180,8 +184,11 @@ export class BookDashboardComponent implements OnInit {
     this.formValue.enable();
     this.showButtonAdd = true;
     this.showButtonUpdate = false;
-    this.element= document.getElementById("InputTenSach")
-    this.element.setAttribute("autofocus")
+
+    // this.element= document.getElementById("InputTenSach")
+    // this.element.Input.focus();
+
+    // this.formValue.controls.tensach.focus();
 
   }
   //Thêm sách mới

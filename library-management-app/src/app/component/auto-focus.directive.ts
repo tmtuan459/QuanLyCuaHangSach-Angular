@@ -13,7 +13,7 @@ export class AutoFocusDirectiveDirective {
     },100);
   }
 
-  @HostListener('submit')
+  @HostListener('click') postBookDetails(){ }
   onFormSubmit() {
     const invalidControl = this.el.nativeElement.querySelector('.ng-invalid');
     if (invalidControl) {

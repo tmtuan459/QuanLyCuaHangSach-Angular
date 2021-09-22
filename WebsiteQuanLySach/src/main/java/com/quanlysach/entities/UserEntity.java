@@ -73,9 +73,9 @@ public class UserEntity {
     
     @JsonIgnore
  	@OneToMany(fetch = FetchType.LAZY,mappedBy = "staffId")
-    private Set<PhieuNhapEntity> phieunhap;
+    private Set<ImportEntity> phieunhap;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "staff")
-    private Set<PhieuXuatEntity> phieuxuat;
+    private Set<ExportEntity> phieuxuat;
     
     
 	
@@ -149,19 +149,19 @@ public class UserEntity {
 		this.role = role;
 	}
 
-	public Set<PhieuNhapEntity> getPhieunhap() {
+	public Set<ImportEntity> getPhieunhap() {
 		return phieunhap;
 	}
 
-	public void setPhieunhap(Set<PhieuNhapEntity> phieunhap) {
+	public void setPhieunhap(Set<ImportEntity> phieunhap) {
 		this.phieunhap = phieunhap;
 	}
 
-	public Set<PhieuXuatEntity> getPhieuxuat() {
+	public Set<ExportEntity> getPhieuxuat() {
 		return phieuxuat;
 	}
 
-	public void setPhieuxuat(Set<PhieuXuatEntity> phieuxuat) {
+	public void setPhieuxuat(Set<ExportEntity> phieuxuat) {
 		this.phieuxuat = phieuxuat;
 	}
 
